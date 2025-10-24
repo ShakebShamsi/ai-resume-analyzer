@@ -119,16 +119,16 @@ const Upload = () => {
                {!isProcessing && (
                   <form id="upload-form" onSubmit={handleSubmit} className="flex flex-col gap-4 mt-8">
                      <div className="form-div">
-                        <label htmlFor="company-name">Company Name * (min. 2 characters)</label>
+                        <label htmlFor="company-name">Company Name *</label>
                         <input type="text" name="company-name" placeholder="Company Name" id="company-name" required minLength={2} />
                      </div>
                      <div className="form-div">
-                        <label htmlFor="job-title">Job Title * (min. 5 characters)</label>
+                        <label htmlFor="job-title">Job Title *</label>
                         <input type="text" name="job-title" placeholder="Job Title" id="job-title" required minLength={5} />
                      </div>
                      <div className="form-div">
-                        <label htmlFor="job-description">Job Description * (min. 150 characters)</label>
-                        <textarea rows={5} name="job-description" placeholder="Job Description" id="job-description" required minLength={50} />
+                        <label htmlFor="job-description">Job Description * </label>
+                        <textarea rows={5} name="job-description" placeholder="Job Description" id="job-description" required minLength={150} />
                      </div>
 
                      <div className="form-div">
