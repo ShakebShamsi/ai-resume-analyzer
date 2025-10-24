@@ -50,9 +50,9 @@ If you're getting started and need assistance or face any bugs, join our active 
 
 - **[React Router v7](https://reactrouter.com/)** is the go‑to routing library for React apps, offering nested routes, data loaders/actions, error boundaries, code splitting, and SSR support—all with a smooth upgrade path from v6.
 
-- **[Puter.com](https://jsm.dev/resumind-puter)** is an advanced, open-source internet operating system designed to be feature-rich, exceptionally fast, and highly extensible. Puter can be used as: A privacy-first personal cloud to keep all your files, apps, and games in one secure place, accessible from anywhere at any time.
+- **[Puter.com](https://jsm.dev/ResuMatrix-puter)** is an advanced, open-source internet operating system designed to be feature-rich, exceptionally fast, and highly extensible. Puter can be used as: A privacy-first personal cloud to keep all your files, apps, and games in one secure place, accessible from anywhere at any time.
 
-- **[Puter.js](https://jsm.dev/resumind-puterjs)** is a tiny client‑side SDK that adds serverless auth, storage, database, and AI (GPT, Claude, DALL·E, OCR…) straight into your browser app—no backend needed and costs borne by users.
+- **[Puter.js](https://jsm.dev/ResuMatrix-puterjs)** is a tiny client‑side SDK that adds serverless auth, storage, database, and AI (GPT, Claude, DALL·E, OCR…) straight into your browser app—no backend needed and costs borne by users.
 
 - **[Tailwind CSS](https://tailwindcss.com/)** is a utility-first CSS framework that allows developers to design custom user interfaces by applying low-level utility classes directly in HTML, streamlining the design process.
 
@@ -117,9 +117,9 @@ Open [http://localhost:5173](http://localhost:5173) in your browser to view the 
 
 ## <a name="links">🔗 Assets</a>
 
-Assets and snippets used in the project can be found in the **[video kit](https://jsm.dev/resumind-kit)**.
+Assets and snippets used in the project can be found in the **[video kit](https://jsm.dev/ResuMatrix-kit)**.
 
-<a href="https://jsm.dev/resumind-kit" target="_blank">
+<a href="https://jsm.dev/ResuMatrix-kit" target="_blank">
   <img src="public/readme/videokit.webp" alt="Video Kit Banner">
 </a>
 
@@ -130,6 +130,6 @@ Assets and snippets used in the project can be found in the **[video kit](https:
 Enjoyed creating this project? Dive deeper into our PRO courses for a richer learning adventure. They're packed with
 detailed explanations, cool features, and exercises to boost your skills. Give it a go!
 
-<a href="https://jsm.dev/resumind-courses" target="_blank">
+<a href="https://jsm.dev/ResuMatrix-courses" target="_blank">
   <img src="public/readme/jsmpro.webp" alt="Project Banner">
 </a>
