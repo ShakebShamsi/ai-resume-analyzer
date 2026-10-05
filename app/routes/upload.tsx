@@ -13,6 +13,8 @@ const Upload = () => {
    const navigate = useNavigate();
 
    const [isProcessing, setIsProcessing] = useState(false);
+   const [isSigningIn, setIsSigningIn] = useState(false);
+   const [authMessage, setAuthMessage] = useState('');
    const [statusText, setStatusText] = useState('');
    const [file, setFile] = useState<File | null>(null);
 
@@ -104,7 +106,7 @@ const Upload = () => {
       }
    };
 
-   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
       e.preventDefault();
 
       const form = e.currentTarget.closest('form');
@@ -141,6 +143,30 @@ const Upload = () => {
          return;
       }
 
+      if (isLoading) {
+         setAuthMessage("Checking your Puter sign-in. Please try again in a moment.");
+         return;
+      }
+
+      if (!usePuterStore.getState().auth.isAuthenticated) {
+         setIsSigningIn(true);
+         setAuthMessage('');
+         try {
+            await auth.signIn();
+         } catch {
+            setAuthMessage("Could not open Puter sign-in. Please try again.");
+            setIsSigningIn(false);
+            return;
+         }
+         setIsSigningIn(false);
+
+         if (!usePuterStore.getState().auth.isAuthenticated) {
+            setAuthMessage("Sign in with Puter to analyze your resume.");
+            return;
+         }
+      }
+
+      setAuthMessage('');
       handleAnalyze({ companyName, jobTitle, jobDescription, file });
    };
 
@@ -211,10 +237,15 @@ const Upload = () => {
                      <button
                         className="upload-button rounded-full px-4 py-2 cursor-pointer w-full"
                         type="submit"
-                        disabled={isProcessing}
+                        disabled={isProcessing || isSigningIn}
                      >
-                        Analyze Resume
+                        {isSigningIn ? "Signing in..." : "Analyze Resume"}
                      </button>
+                     {(isSigningIn || authMessage) && (
+                        <p className="text-center text-sm" role="status">
+                           {isSigningIn ? "Complete Puter sign-in to continue." : authMessage}
+                        </p>
+                     )}
                   </form>
                )}
             </div>
