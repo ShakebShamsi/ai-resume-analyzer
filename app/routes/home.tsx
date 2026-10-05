@@ -13,10 +13,31 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home() {
-   const { auth, kv } = usePuterStore();
+   const { auth, fs, kv } = usePuterStore();
    const navigate = useNavigate();
    const [resumes, setResumes] = useState<Resume[]>([]);
    const [loadingResumes, setLoadingResumes] = useState(false);
+
+   const handleDeleteResume = async (resume: Resume) => {
+      const key = `resume:${resume.id}`;
+      const wasDeleted = await kv.delete(key);
+      if (wasDeleted !== true) {
+         const remainingValue = await kv.get(key);
+         if (remainingValue !== null) {
+            throw new Error("Puter did not confirm removing this history. Check your connection and try again.");
+         }
+      }
+
+      setResumes((currentResumes) => currentResumes.filter((item) => item.id !== resume.id));
+
+      const fileCleanup = await Promise.allSettled([
+         fs.delete(resume.resumePath),
+         fs.delete(resume.imagePath),
+      ]);
+      if (fileCleanup.some((result) => result.status === "rejected")) {
+         console.warn("Resume history was deleted, but one or more uploaded files could not be removed.");
+      }
+   };
 
    useEffect(() => {
       if (!auth.isAuthenticated) navigate('/auth?next=/');
@@ -60,15 +81,15 @@ export default function Home() {
          {!loadingResumes && resumes.length > 0 && (
             <div className="resumes-section">
                {resumes.map((resume) => (
-                  <ResumeCard key={resume.id} resume={resume} />
+                  <ResumeCard key={resume.id} resume={resume} onDelete={handleDeleteResume} />
                ))}
             </div>
          )}
 
          {!loadingResumes && resumes?.length === 0 && (
             <div className="flex flex-col items-center justify-center mt-10 gap-4">
-               <Link to="/upload" className="primary-button w-fit text-xl font-semibold">
-                  Upload Resume
+               <Link to="/upload" className="upload-button">
+                  Upload resume
                </Link>
             </div>
          )}
