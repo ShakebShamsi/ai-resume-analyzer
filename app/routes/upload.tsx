@@ -5,6 +5,7 @@ import { usePuterStore } from "~/lib/puter";
 import { useNavigate } from "react-router";
 import { convertPdfToImage } from "~/lib/pdf2img";
 import { generateUUID } from "~/lib/utils";
+import { parseFeedbackResponse } from "~/lib/feedback";
 import { prepareInstructions } from "../../constants";
 
 const Upload = () => {
@@ -31,11 +32,16 @@ const Upload = () => {
       file: File;
    }) => {
       setIsProcessing(true);
+      let uploadedResumePath: string | undefined;
+      let uploadedImagePath: string | undefined;
+      let historyKey: string | undefined;
+      let historySaved = false;
 
       try {
          setStatusText('Uploading the file...');
          const uploadedFile = await fs.upload([file]);
          if (!uploadedFile) throw new Error('Failed to upload file');
+         uploadedResumePath = uploadedFile.path;
 
          setStatusText('Converting to image...');
          const imageFile = await convertPdfToImage(file);
@@ -44,22 +50,12 @@ const Upload = () => {
          setStatusText('Uploading the image...');
          const uploadedImage = await fs.upload([imageFile.file]);
          if (!uploadedImage) throw new Error('Failed to upload image');
+         uploadedImagePath = uploadedImage.path;
 
          setStatusText('Preparing data...');
          const uuid = generateUUID();
 
-         const data = {
-            id: uuid,
-            resumePath: uploadedFile.path,
-            imagePath: uploadedImage.path,
-            companyName,
-            jobTitle,
-            jobDescription,
-            feedback: '',
-         };
-
-         await kv.set(`resume:${uuid}`, JSON.stringify(data));
-
+         historyKey = `resume:${uuid}`;
          setStatusText('Analyzing...');
 
          const feedback = await ai.feedback(
@@ -68,30 +64,35 @@ const Upload = () => {
          );
 
          if (!feedback?.message?.content) {
-            throw new Error('AI returned empty feedback');
+            throw new Error('Claude returned an empty response');
          }
 
-         const feedbackText =
-            typeof feedback.message.content === 'string'
-               ? feedback.message.content
-               : feedback.message.content[0]?.text;
+         const parsedFeedback = parseFeedbackResponse(feedback.message.content);
+         const data: Resume = {
+            id: uuid,
+            resumePath: uploadedFile.path,
+            imagePath: uploadedImage.path,
+            companyName,
+            jobTitle,
+            feedback: parsedFeedback,
+         };
 
-         if (!feedbackText) {
-            throw new Error('Invalid AI response format');
-         }
-
-         try {
-            data.feedback = JSON.parse(feedbackText);
-         } catch {
-            throw new Error('AI response is not valid JSON');
-         }
-
-         await kv.set(`resume:${uuid}`, JSON.stringify(data));
+         const wasSaved = await kv.set(historyKey, JSON.stringify(data));
+         if (!wasSaved) throw new Error('Failed to save resume analysis');
+         historySaved = true;
 
          setStatusText('Analysis complete, redirecting...');
          navigate(`/resume/${uuid}`);
       } catch (error: any) {
          console.error('Resume analysis failed:', error);
+
+         if (!historySaved) {
+            await Promise.allSettled([
+               ...(historyKey ? [kv.delete(historyKey)] : []),
+               ...(uploadedResumePath ? [fs.delete(uploadedResumePath)] : []),
+               ...(uploadedImagePath ? [fs.delete(uploadedImagePath)] : []),
+            ]);
+         }
 
          if (String(error?.message).includes('Model not found')) {
             setStatusText('AI model unavailable. Please try again later.');
@@ -208,7 +209,7 @@ const Upload = () => {
                      </div>
 
                      <button
-                        className="primary-button"
+                        className="upload-button rounded-full px-4 py-2 cursor-pointer w-full"
                         type="submit"
                         disabled={isProcessing}
                      >

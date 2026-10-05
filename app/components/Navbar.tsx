@@ -4,7 +4,7 @@ const Navbar = () => {
    return (
       <nav className="navbar" aria-label="Main navigation">
          <Link to="/" className="flex min-w-0 items-center gap-3" aria-label="ResuMatrix home">
-            <span className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-[#D9EFE6] text-base font-bold text-[#123F3B]">
+            <span >
                <img src="public/favicon.ico" alt="logo" />
             </span>
             <span className="min-w-0">
